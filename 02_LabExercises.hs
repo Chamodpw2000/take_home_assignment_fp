@@ -1,3 +1,16 @@
+-- =====================================================================
+-- EC8206 Functional Programming  |  University of Ruhuna
+-- Workshop: Higher-Order Functions  (approx. 25 minutes in class)
+--
+-- Instructions:
+--   1. Load this file:        ghci 02_LabExercises.hs
+--   2. Replace each `undefined` with your own implementation.
+--   3. Reload with `:r` and check with the sample tests: runTests
+--
+-- Rules: do NOT use explicit recursion in Part B — use map / filter /
+-- folds / partial application instead. That is the point!
+-- =====================================================================
+  
 module Main where
 import Data.Char (toUpper)
 
@@ -8,14 +21,14 @@ import Data.Char (toUpper)
 -- A1. Write applyThrice, which applies a function three times.
 --     applyThrice (+2) 1   =>  7
 applyThrice :: (a -> a) -> a -> a
-applyThrice = undefined
+applyThrice f x = f (f (f x))
 
 -- A2. Write pipeline, which applies a LIST of functions left to right.
 --     pipeline [(+1), (*2)] 5   =>  12       (first +1, then *2)
 --     Hint: recursion over the list of functions is allowed here,
 --           or try foldl if you feel brave.
 pipeline :: [a -> a] -> a -> a
-pipeline = undefined
+pipeline fs x = foldl (\acc f -> f acc) x fs
 
 -- ---------------------------------------------------------------------
 -- PART B: map, filter, fold                       [Target: 12 minutes]
@@ -25,34 +38,35 @@ pipeline = undefined
 --     Formula: f = c * 9 / 5 + 32
 --     toFahrenheit [0, 100]   =>  [32.0, 212.0]
 toFahrenheit :: [Double] -> [Double]
-toFahrenheit = undefined
+toFahrenheit = map (\c -> c * 9 / 5 + 32)
 
 -- B2. Keep only the passing marks (mark >= 40) from a list.
 --     passing [35, 40, 88, 12]   =>  [40, 88]
 passing :: [Int] -> [Int]
-passing = undefined
+passing = filter (>= 40)
 
 -- B3. Count how many elements satisfy a predicate — WITHOUT recursion.
 --     countIf even [1..10]   =>  5
 --     Hint: filter, then length. Or a fold.
 countIf :: (a -> Bool) -> [a] -> Int
-countIf = undefined
+countIf p = length . filter p
 
 -- B4. Implement `myMaximum` for a non-empty list using foldr or foldl.
 --     myMaximum [3, 9, 4]   =>  9
 --     Hint: use `max` as the combining function; think about what the
 --     starting value should be (try foldr1 / foldl1, or use head).
 myMaximum :: [Int] -> Int
-myMaximum = undefined
+myMaximum = foldr1 max
 
 -- B5. Using a single fold, compute the sum AND the count in one pass,
 --     returning them as a pair. Then use it to write `average`.
 --     sumAndCount [10, 20, 30]   =>  (60, 3)
 sumAndCount :: [Int] -> (Int, Int)
-sumAndCount = undefined
+sumAndCount = foldr (\x (s, c) -> (s + x, c + 1)) (0, 0)
 
 average :: [Int] -> Double
-average xs = undefined
+average xs = fromIntegral s / fromIntegral c
+  where (s, c) = sumAndCount xs
 
 -- ---------------------------------------------------------------------
 -- PART C: Currying & partial application          [Target: 8 minutes]
@@ -62,14 +76,14 @@ average xs = undefined
 --     define a function that adds 18% VAT to a price.
 --     addVAT 100   =>  118.0
 addVAT :: Double -> Double
-addVAT = undefined            -- e.g. something like (* ...)
+addVAT = (* 1.18)
 
 -- C2. Define `startsWithA` using partial application of a library
 --     function, to keep only words beginning with 'A'.
 --     startsWithA ["Apple", "Ball", "Ant"]   =>  ["Apple", "Ant"]
 --     Hint: filter, head, (==) ... or ((== 'A') . head)
 startsWithA :: [String] -> [String]
-startsWithA = undefined
+startsWithA = filter ((== "A") . take 1)
 
 -- C3. CHALLENGE: student records are (name, mark) pairs.
 --     Produce the names of students who passed (mark >= 40),
@@ -78,7 +92,7 @@ startsWithA = undefined
 --     Hint: import Data.Char (toUpper) mentally — or use
 --           map (\c -> if c >= 'a' && c <= 'z' then toEnum (fromEnum c - 32) else c)
 honourBoard :: [(String, Int)] -> [String]
-honourBoard = undefined
+honourBoard = map (map toUpper . fst) . filter ((>= 40) . snd)
 
 -- ---------------------------------------------------------------------
 -- Simple test harness — run `runTests` in GHCi

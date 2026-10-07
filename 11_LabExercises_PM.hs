@@ -11,6 +11,7 @@
 -- == on whole structures. That is the point!
 -- =====================================================================
 
+
 module Main where
 
 -- ---------------------------------------------------------------------
@@ -20,14 +21,19 @@ module Main where
 -- A1. Write sinhalaDigit for 0, 1 and 2; everything else is "?".
 --     sinhalaDigit 0 = "binduwa", 1 = "eka", 2 = "deka", _ = "?"
 sinhalaDigit :: Int -> String
-sinhalaDigit = undefined
+sinhalaDigit 0 = "binduwa"
+sinhalaDigit 1 = "eka"
+sinhalaDigit 2 = "deka"
+sinhalaDigit _ = "?"
 
 -- A2. Write isWeekendDay using String literal patterns for
 --     "Sat" and "Sun"; a wildcard for the rest.
 --     isWeekendDay "Sat"   =>  True
 --     isWeekendDay "Mon"   =>  False
 isWeekendDay :: String -> Bool
-isWeekendDay = undefined
+isWeekendDay "Sat" = True
+isWeekendDay "Sun" = True
+isWeekendDay _     = False
 
 -- A3. Write startsWithA, matching the FIRST Char of a String with a
 --     literal inside the (:) pattern. Empty strings give False.
@@ -35,7 +41,9 @@ isWeekendDay = undefined
 --     startsWithA "Kasun"  =>  False
 --     startsWithA ""       =>  False
 startsWithA :: String -> Bool
-startsWithA = undefined
+startsWithA ('A' : _) = True
+startsWithA ('a' : _) = True
+startsWithA _         = False
 
 -- ---------------------------------------------------------------------
 -- PART B: Guards & structures                     [Target: 10 minutes]
@@ -44,7 +52,12 @@ startsWithA = undefined
 -- B1. Write gradeOf using GUARDS (>= comparisons, otherwise):
 --     75+ -> 'A',  65+ -> 'B',  55+ -> 'C',  40+ -> 'S',  else 'F'
 gradeOf :: Int -> Char
-gradeOf mark = undefined
+gradeOf mark
+  | mark >= 75 = 'A'
+  | mark >= 65 = 'B'
+  | mark >= 55 = 'C'
+  | mark >= 40 = 'S'
+  | otherwise  = 'F'
 
 -- B2. Write quadrant for a coordinate pair, combining a tuple
 --     PATTERN with GUARDS:
@@ -54,7 +67,12 @@ gradeOf mark = undefined
 --     quadrant (3, -4)   =>  "IV"     (x > 0, y < 0)
 --     anything on an axis => "axis"
 quadrant :: (Int, Int) -> String
-quadrant = undefined
+quadrant (x, y)
+  | x > 0 && y > 0 = "I"
+  | x < 0 && y > 0 = "II"
+  | x < 0 && y < 0 = "III"
+  | x > 0 && y < 0 = "IV"
+  | otherwise      = "axis"
 
 -- B3. Write secondElement using multi-element list patterns
 --     (no length, no !!):
@@ -62,7 +80,8 @@ quadrant = undefined
 --     secondElement [7]      =>  Nothing
 --     secondElement []       =>  Nothing
 secondElement :: [a] -> Maybe a
-secondElement = undefined
+secondElement (_ : y : _) = Just y
+secondElement _           = Nothing
 
 -- B4. Write sameFirstTwo: True when a list's first two elements are
 --     equal. Lists with fewer than two elements give False.
@@ -70,7 +89,8 @@ secondElement = undefined
 --     sameFirstTwo [5,5,1]  =>  True
 --     sameFirstTwo [5,4,5]  =>  False
 sameFirstTwo :: Eq a => [a] -> Bool
-sameFirstTwo = undefined
+sameFirstTwo (x : y : _) = x == y
+sameFirstTwo _           = False
 
 -- ---------------------------------------------------------------------
 -- PART C: Recursive patterns on lists & trees     [Target: 8 minutes]
@@ -80,7 +100,10 @@ sameFirstTwo = undefined
 --     plus guards (no filter/length - we are practising recursion!).
 --     countPositives [3, -1, 7, 0]  =>  2
 countPositives :: [Int] -> Int
-countPositives = undefined
+countPositives [] = 0
+countPositives (x : xs)
+  | x > 0     = 1 + countPositives xs
+  | otherwise = countPositives xs
 
 -- The tree type from the lecture:
 data Tree = Leaf
@@ -97,19 +120,22 @@ sample =
 --     of both subtrees.
 --     countLeaves sample  =>  7
 countLeaves :: Tree -> Int
-countLeaves = undefined
+countLeaves Leaf         = 1
+countLeaves (Node l _ r) = countLeaves l + countLeaves r
 
 -- C3. Write treeMax for the LARGEST value in a tree; a Leaf
 --     contributes minBound (the smallest possible Int).
 --     treeMax sample  =>  9
 treeMax :: Tree -> Int
-treeMax = undefined
+treeMax Leaf         = minBound
+treeMax (Node l v r) = treeMax l `max` v `max` treeMax r
 
 -- C4. CHALLENGE: write mirror, which swaps left and right subtrees
 --     all the way down.
 --     toList (mirror sample)  =>  [9,8,5,4,3,1]
 mirror :: Tree -> Tree
-mirror = undefined
+mirror Leaf         = Leaf
+mirror (Node l v r) = Node (mirror r) v (mirror l)
 
 -- (helper used by the C4 test)
 toList :: Tree -> [Int]
